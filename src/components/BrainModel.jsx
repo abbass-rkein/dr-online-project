@@ -2,7 +2,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Environment } from "@react-three/drei";
 
 function Heart() {
-  const { scene } = useGLTF("/models/btain.glb");
+  const { scene } = useGLTF("/models/brain.glb");
 
   return (
     <primitive
