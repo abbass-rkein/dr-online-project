@@ -8,7 +8,6 @@ import About from "./pages/About.jsx";
 import Services from "./pages/Services.jsx";
 import Doctors from "./pages/Doctors.jsx";
 import Contact from "./pages/Contact.jsx";
-import Anatomy from "./pages/Anatomy.jsx";
 
 export default function App() {
   return (
@@ -21,7 +20,6 @@ export default function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/anatomy" element={<Anatomy />} />
         </Routes>
       </main>
       <Footer />
