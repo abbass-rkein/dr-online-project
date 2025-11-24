@@ -169,9 +169,3 @@ Developed by **Abbass Rkein** 🩺
 For university projects, portfolio use, or expansion into a real medical platform.
 
 ---
-
-If you want, I can also:
-✅ create the screenshots for you
-✅ generate a GitHub-ready version
-✅ add badges (React, Vite, Tailwind)
-Just tell me!
