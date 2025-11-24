@@ -14,7 +14,7 @@ function Heart() {
   );
 }
 
-export default function HeartModel() {
+export default function BodyModel() {
   return (
     <div className="w-full h-[450px] rounded-3xl overflow-hidden shadow-lg bg-white">
       <Canvas camera={{ position: [0, 0, 3.5], fov: 50 }} shadows>
