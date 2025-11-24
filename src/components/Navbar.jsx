@@ -57,6 +57,14 @@ export default function Navbar() {
               Find Doctors
             </NavLink>
             <NavLink
+              to="/anatomy"
+              className={({ isActive }) =>
+                `${linkBase} ${isActive ? activeClass : inactiveClass}`
+              }
+            >
+              Anatomy
+            </NavLink>
+            <NavLink
               to="/about"
               className={({ isActive }) =>
                 `${linkBase} ${isActive ? activeClass : inactiveClass}`
