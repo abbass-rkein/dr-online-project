@@ -21,6 +21,7 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
+  // ---------------- LOGIN ----------------
   async function doLogin(e) {
     e.preventDefault();
     setErr("");
@@ -34,50 +35,76 @@ export default function Auth() {
       });
 
       const j = await r.json().catch(() => ({}));
-      if (!r.ok || !j.ok) throw new Error(j.error || "Login failed");
+
+      if (!r.ok || !j.ok) {
+        throw new Error(j.error || "Login failed");
+      }
 
       setToken(j.token);
 
       const role = decodeJwt(j.token)?.role || "";
 
-      // ✅ route by role
+      // route by role
       if (role === "ADMIN") nav("/admin");
       else if (role === "DOCTOR") nav("/doctor/dashboard");
       else nav("/");
+
     } catch (e2) {
-      setErr(String(e2.message || e2));
+      setErr(e2.message || "Unexpected error occurred");
     } finally {
       setLoading(false);
     }
   }
 
+  // ---------------- REGISTER ----------------
   async function doRegister(e) {
     e.preventDefault();
     setErr("");
+
+    // client-side validation
+    if (password.length < 8) {
+      setErr("Password must be at least 8 characters long");
+      return;
+    }
+
     setLoading(true);
 
     try {
+      const payload = {
+        full_name: fullName,
+        email,
+        password,
+        phone: phone || null,
+        country: country || null,
+      };
+
       const r = await fetch(`${API}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          full_name: fullName,
-          email,
-          password,
-          phone: phone || null,
-          country: country || null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const j = await r.json().catch(() => ({}));
-      if (!r.ok || !j.ok) throw new Error(j.error || "Signup failed");
+
+      if (!r.ok) {
+        // handle backend errors gracefully
+        let msg = j.error;
+        if (!msg && j.errors) {
+          // in case backend returns array of validation errors
+          msg = Array.isArray(j.errors) ? j.errors.join(", ") : j.errors;
+        }
+        throw new Error(msg || "Signup failed");
+      }
+
+      if (!j.ok) throw new Error(j.error || "Signup failed");
 
       setToken(j.token);
 
-      // signup always PATIENT in your backend => go home
+      // signup always PATIENT
       nav("/");
-    } catch (e2) {
-      setErr(String(e2.message || e2));
+
+    } catch (err) {
+      setErr(err.message || "Unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -97,10 +124,7 @@ export default function Auth() {
         <div className="mt-5 grid grid-cols-2 gap-2">
           <button
             type="button"
-            onClick={() => {
-              setErr("");
-              setTab("login");
-            }}
+            onClick={() => { setErr(""); setTab("login"); }}
             className={`px-4 py-2 rounded-xl border text-sm font-semibold ${
               tab === "login"
                 ? "border-sky-400 bg-sky-50 text-sky-700"
@@ -111,10 +135,7 @@ export default function Auth() {
           </button>
           <button
             type="button"
-            onClick={() => {
-              setErr("");
-              setTab("register");
-            }}
+            onClick={() => { setErr(""); setTab("register"); }}
             className={`px-4 py-2 rounded-xl border text-sm font-semibold ${
               tab === "register"
                 ? "border-sky-400 bg-sky-50 text-sky-700"
@@ -125,19 +146,17 @@ export default function Auth() {
           </button>
         </div>
 
-        {err ? (
+        {err && (
           <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
             {err}
           </div>
-        ) : null}
+        )}
 
         {/* Forms */}
         {tab === "login" ? (
           <form onSubmit={doLogin} className="mt-5 space-y-3">
             <div>
-              <label className="text-xs font-semibold text-slate-700">
-                Email
-              </label>
+              <label className="text-xs font-semibold text-slate-700">Email</label>
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -150,9 +169,7 @@ export default function Auth() {
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-700">
-                Password
-              </label>
+              <label className="text-xs font-semibold text-slate-700">Password</label>
               <input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -176,9 +193,7 @@ export default function Auth() {
         ) : (
           <form onSubmit={doRegister} className="mt-5 space-y-3">
             <div>
-              <label className="text-xs font-semibold text-slate-700">
-                Full name
-              </label>
+              <label className="text-xs font-semibold text-slate-700">Full name</label>
               <input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -191,9 +206,7 @@ export default function Auth() {
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-700">
-                Email
-              </label>
+              <label className="text-xs font-semibold text-slate-700">Email</label>
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -206,9 +219,7 @@ export default function Auth() {
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-700">
-                Password
-              </label>
+              <label className="text-xs font-semibold text-slate-700">Password</label>
               <input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -222,9 +233,7 @@ export default function Auth() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-slate-700">
-                  Phone (optional)
-                </label>
+                <label className="text-xs font-semibold text-slate-700">Phone (optional)</label>
                 <input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -236,9 +245,7 @@ export default function Auth() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-700">
-                  Country (optional)
-                </label>
+                <label className="text-xs font-semibold text-slate-700">Country (optional)</label>
                 <input
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
